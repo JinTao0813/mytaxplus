@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import chat, documents, filing, profile, reliefs, tax
+from app.api.v1.endpoints import auth_session, chat, documents, filing, profile, reliefs, tax
 
 api_router = APIRouter()
+api_router.include_router(auth_session.router, prefix="/auth", tags=["auth"])
 api_router.include_router(documents.router, prefix="/documents", tags=["documents"])
 api_router.include_router(profile.router, prefix="/profile", tags=["profile"])
 api_router.include_router(reliefs.router, prefix="/reliefs", tags=["reliefs"])

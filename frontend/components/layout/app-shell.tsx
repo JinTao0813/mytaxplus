@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 import { useAuth } from '@/hooks/useAuth'
+import { UserMenu } from '@/components/layout/user-menu'
 import { MatIcon } from '@/components/ui/mat-icon'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -54,13 +55,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <span className="text-xl font-black tracking-tighter text-secondary">
           MyTax+
         </span>
-        <div className="flex items-center gap-3 text-on-surface-variant">
-          <button className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-surface-container-high transition-colors">
-            <MatIcon name="notifications" className="text-xl" />
-          </button>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-surface-container-high transition-colors">
-            <MatIcon name="settings" className="text-xl" />
-          </button>
+        <div className="flex items-center gap-2 text-on-surface-variant">
+          <UserMenu variant="header" />
         </div>
       </nav>
 
@@ -121,10 +117,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <MatIcon name="help" className="text-base" />
               <span>Support</span>
             </Link>
-            <button className="flex items-center gap-3 rounded-lg px-4 py-2 text-sm text-on-surface-variant hover:bg-surface-container-high transition-colors text-left">
-              <MatIcon name="logout" className="text-base" />
-              <span>Logout</span>
-            </button>
+            <UserMenu variant="sidebar" />
           </div>
         </div>
       </aside>

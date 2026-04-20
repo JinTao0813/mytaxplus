@@ -1,9 +1,19 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { MatIcon } from '@/components/ui/mat-icon'
 import type { UploadedDocument } from '@/lib/types'
+import { getDocuments, registerUploadedDocument } from '@/lib/services'
+import { useAuth } from '@/hooks/useAuth'
+import {
+  isFirebaseStorageReady,
+  isFirebaseConfigured,
+} from '@/lib/firebase/client'
+import { uploadUserDocument } from '@/lib/firebase/upload-user-document'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+
+const USE_REAL_API = process.env.NEXT_PUBLIC_USE_MOCK === 'false'
 
 function formatFileSize(kb: number) {
   return kb >= 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`
@@ -59,36 +69,113 @@ interface Props {
 }
 
 export function UploadDropZone({ initialDocs }: Props) {
+  const { user, loading: authLoading, devBypass } = useAuth()
   const [docs, setDocs] = useState<UploadedDocument[]>(initialDocs)
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
 
-  function handleFiles(files: FileList | null) {
-    if (!files) return
-    Array.from(files).forEach((file) => {
-      const newDoc: UploadedDocument = {
-        id: `doc-${Date.now()}-${Math.random()}`,
-        name: file.name,
-        sizeKb: Math.round(file.size / 1024),
-        uploadedAt: new Date().toISOString(),
-        status: 'uploading',
-        category: null,
+  useEffect(() => {
+    setDocs(initialDocs)
+  }, [initialDocs])
+
+  useEffect(() => {
+    if (!USE_REAL_API || authLoading || devBypass || !user) {
+      return
+    }
+    let cancelled = false
+    ;(async () => {
+      try {
+        if (cancelled) return
+        const list = await getDocuments()
+        if (!cancelled) setDocs(list)
+      } catch {
+        /* keep existing list */
       }
-      setDocs((prev) => [newDoc, ...prev])
-      setTimeout(() => {
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [user, authLoading, devBypass])
+
+  async function processFile(file: File) {
+    const id = crypto.randomUUID()
+    const sizeKb = Math.max(1, Math.round(file.size / 1024))
+    const newDoc: UploadedDocument = {
+      id,
+      name: file.name,
+      sizeKb,
+      uploadedAt: new Date().toISOString(),
+      status: 'uploading',
+      category: null,
+    }
+    setDocs((prev) => [newDoc, ...prev])
+
+    if (!USE_REAL_API) {
+      window.setTimeout(() => {
         setDocs((prev) =>
           prev.map((d) =>
-            d.id === newDoc.id
-              ? { ...d, status: 'processed', category: 'other' }
-              : d
+            d.id === id ? { ...d, status: 'processed', category: 'other' } : d
           )
         )
       }, 2000)
+      return
+    }
+
+    try {
+      if (devBypass || !user) {
+        throw new Error(
+          'Sign in with Firebase (disable dev bypass) to upload with the real API.'
+        )
+      }
+      if (!isFirebaseConfigured() || !isFirebaseStorageReady()) {
+        throw new Error(
+          'Firebase Storage is not configured. Set NEXT_PUBLIC_FIREBASE_* including STORAGE_BUCKET.'
+        )
+      }
+      setDocs((prev) =>
+        prev.map((d) =>
+          d.id === id ? { ...d, status: 'processing' as const } : d
+        )
+      )
+
+      const { storagePath } = await uploadUserDocument(user, file, id)
+      const registered = await registerUploadedDocument({
+        documentId: id,
+        storagePath,
+        originalFilename: file.name,
+        sizeKb,
+      })
+      setDocs((prev) => prev.map((d) => (d.id === id ? registered : d)))
+    } catch {
+      setDocs((prev) =>
+        prev.map((d) => (d.id === id ? { ...d, status: 'error' as const } : d))
+      )
+    }
+  }
+
+  function handleFiles(files: FileList | null) {
+    if (!files) return
+    Array.from(files).forEach((file) => {
+      void processFile(file)
     })
   }
 
+  const showRealApiHint =
+    USE_REAL_API && (devBypass || !isFirebaseStorageReady())
+
   return (
     <>
+      {showRealApiHint ? (
+        <Alert variant="destructive" className="mb-4">
+          <AlertTitle>Cannot upload to the real API</AlertTitle>
+          <AlertDescription>
+            {devBypass
+              ? 'Turn off NEXT_PUBLIC_DEV_AUTH_BYPASS and sign in with Firebase.'
+              : 'Configure Firebase web env vars including NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET.'}
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       {/* Drop zone */}
       <div
         className={cn(
@@ -127,6 +214,7 @@ export function UploadDropZone({ initialDocs }: Props) {
           Support for PDF, JPEG, and PNG. Maximum file size 50 MB.
         </p>
         <button
+          type="button"
           className="rounded-lg bg-secondary px-6 py-3 text-sm font-semibold text-secondary-foreground hover:opacity-90 transition-opacity"
           onClick={(e) => {
             e.stopPropagation()
@@ -167,7 +255,10 @@ export function UploadDropZone({ initialDocs }: Props) {
               </div>
               <div className="flex items-center gap-3">
                 <StatusBadge status={doc.status} />
-                <button className="text-outline hover:text-secondary transition-colors">
+                <button
+                  type="button"
+                  className="text-outline hover:text-secondary transition-colors"
+                >
                   <MatIcon name="more_vert" className="text-xl" />
                 </button>
               </div>
