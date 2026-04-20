@@ -1,13 +1,20 @@
+import type { AiExtraction, UploadedDocument } from '@/lib/types'
 import { getDocuments, getAiExtractions } from '@/lib/services'
 import { AiPanel } from '@/components/layout/ai-panel'
 import { UploadDropZone } from './_components/upload-drop-zone'
 import { CategoryGuide } from './_components/category-guide'
 
 export default async function UploadPage() {
-  const [docs, extractions] = await Promise.all([
-    getDocuments(),
-    getAiExtractions(),
-  ])
+  const useMockServices = process.env.NEXT_PUBLIC_USE_MOCK !== 'false'
+  const [docs, extractions]: [UploadedDocument[], AiExtraction[]] =
+    await Promise.all([
+      useMockServices
+        ? getDocuments()
+        : Promise.resolve([] as UploadedDocument[]),
+      useMockServices
+        ? getAiExtractions()
+        : Promise.resolve([] as AiExtraction[]),
+    ])
 
   const aiPanelExtractions = extractions.map((e) => ({
     id: e.documentId,
