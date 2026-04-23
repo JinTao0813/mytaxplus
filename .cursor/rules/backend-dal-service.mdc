@@ -1,0 +1,39 @@
+---
+description: Next.js API routes + server services + DAL (TypeScript, no Python backend)
+globs: frontend/app/api/**/*.ts,frontend/server/**/*.ts
+alwaysApply: false
+---
+
+# Backend — Route handlers, services, and DAL
+
+The app backend lives in the **Next.js** repo under **`frontend/app/api/v1/`** (Route Handlers) plus **`frontend/server/`** (domain logic, services, optional DAL). Stack: **Next.js**, **Zod** for request/response validation at boundaries, **TypeScript** throughout.
+
+## Layer responsibilities
+
+| Layer               | Location                                                                  | Responsibility                                                                                                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **API**             | `frontend/app/api/v1/**/route.ts`                                         | HTTP: methods, status codes, `requireFirebaseUser`, parse query/body with **Zod**, call **one** service entry point, return `NextResponse.json`. **No** Firestore/DB calls, **no** heavy business rules. |
+| **Service**         | `frontend/server/services/**`                                             | Application workflows, orchestration, mapping engine output to API shapes, validation beyond JSON shape.                                                                                                 |
+| **Engine / domain** | `frontend/server/<domain>/engine/**`, `frontend/server/<domain>/rules/**` | Pure rules and calculations (no I/O). Example: `frontend/server/reliefs/engine/`.                                                                                                                        |
+| **DAL**             | `frontend/server/dal/**` (when added)                                     | **Only** persistence: Firestore/Postgres/etc. CRUD. No product rule enforcement.                                                                                                                         |
+
+## Rules
+
+1. **Single path to the database** — When a DAL exists, all DB access goes through it; route handlers and services do not open clients ad hoc.
+2. **Auth at the edge** — Verify the user in the route (e.g. `requireFirebaseUser(req)` from `frontend/lib/server/auth`). Pass stable identifiers (`uid`) into services.
+3. **Validate at the boundary** — Use **Zod** in routes (or thin wrappers) for request bodies and optional query params. Keep rich rules in services / engine.
+4. **No business logic in DAL** — DAL executes reads/writes as instructed by the service.
+5. **Client vs server** — Browser code uses **`frontend/lib/api/**`\*\* only to call these routes; do not put engine or DAL imports in client components.
+
+## Anti-patterns
+
+- Growing `route.ts` files with multi-step workflows instead of a service.
+- Duplicating rule logic in both UI and server (prefer **`frontend/server/**`\*\* engine + optional thin client helpers that mirror display only).
+- Importing `firebase-admin` or DB clients from React components or `lib/api` client modules.
+
+## File flow (example)
+
+```
+app/api/v1/reliefs/route.ts  →  server/services/reliefs/list-reliefs.ts  →  server/reliefs/engine/*
+        ↑ auth, Zod, JSON                              orchestration                    pure rules
+```

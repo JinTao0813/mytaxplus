@@ -1,62 +1,82 @@
-import { getReliefs } from '@/lib/services'
-import { AiPanel } from '@/components/layout/ai-panel'
-import { SavingsBanner } from './_components/savings-banner'
-import { ReliefStats } from './_components/relief-stats'
-import { ReliefCardList } from './_components/relief-card-list'
+import Link from 'next/link'
+
+import {
+  getProfile,
+  getReliefs,
+  getTaxContext,
+  listReceiptReviewItems,
+} from '@/lib/api'
+import {
+  cookieHeaderFromRequest,
+  hasBackendSessionCookie,
+} from '@/lib/api/server-cookies'
+import type { ReceiptMappingStatus, TaxContext } from '@/lib/types'
+import { ReliefsWorkspace } from './_components/reliefs-workspace'
+
+const INBOX_STATUSES: ReceiptMappingStatus[] = [
+  'in_progress',
+  'unmapped',
+  'suggested',
+  'needs_review',
+  'gemini_error',
+]
 
 export default async function ReliefsPage() {
-  const reliefs = await getReliefs()
+  const cookieHeader = await cookieHeaderFromRequest()
+  const ctx = { cookieHeader }
 
-  const claimed = reliefs.filter((r) => r.status === 'claimed')
-  const actionable = reliefs.filter((r) => r.status !== 'claimed')
-  const totalClaimed = claimed.reduce((s, r) => s + r.claimedAmount, 0)
-  const totalMissed = actionable.reduce(
-    (s, r) => s + (r.maxAmount - r.claimedAmount),
-    0
-  )
+  const reliefs = await getReliefs(ctx)
+  const profile = await getProfile(ctx)
+  let receiptReviewCount = 0
+  let taxContext: TaxContext | null = null
+
+  if (hasBackendSessionCookie(cookieHeader)) {
+    const [queue, ctxSnap] = await Promise.all([
+      listReceiptReviewItems(ctx, { statuses: INBOX_STATUSES }),
+      getTaxContext(ctx).catch(() => null),
+    ])
+    receiptReviewCount = queue.length
+    taxContext = ctxSnap
+  }
 
   return (
-    <div className="flex min-h-screen bg-surface">
-      {/* ── Main content ──────────────────────────────────────────────── */}
-      <main className="flex-1 overflow-y-auto px-6 pb-24 pt-8 md:px-12 md:pb-12 md:pt-12 lg:mr-96">
-        {/* Header */}
-        <header className="mb-10">
-          <h1 className="text-3xl font-semibold tracking-tight text-on-surface">
-            Relief Detection &amp; Optimisation
-          </h1>
-          <p className="mt-2 max-w-2xl text-base leading-relaxed text-on-surface-variant">
-            Our AI has analysed your tax profile to identify eligible Malaysian
-            tax reliefs. Review the optimised calculations below.
+    <div className="min-h-screen bg-surface px-6 pb-24 pt-8 md:px-12 md:pb-12 md:pt-12">
+      <header className="mb-10">
+        <h1 className="text-3xl font-semibold tracking-tight text-on-surface">
+          Relief claim planner
+        </h1>
+        <p className="mt-2 max-w-2xl text-base leading-relaxed text-on-surface-variant">
+          Plan evidence-backed relief claims for the current Year of Assessment.
+          Caps and pools are enforced deterministically; receipt lines appear
+          here after you confirm mappings.
+        </p>
+      </header>
+
+      {receiptReviewCount > 0 ? (
+        <div className="mb-8 rounded-xl border border-outline-variant/30 bg-on-primary-container/10 px-4 py-3 md:px-5">
+          <p className="text-sm font-semibold text-on-surface">
+            {receiptReviewCount}{' '}
+            {receiptReviewCount === 1 ? 'receipt needs' : 'receipts need'}{' '}
+            mapping
           </p>
-        </header>
+          <p className="mt-1 text-xs text-on-surface-variant">
+            Confirm each receipt&apos;s relief in the queue before claims are
+            finalised.
+          </p>
+          <Link
+            href="/receipts/review"
+            className="mt-2 inline-flex text-sm font-semibold text-secondary underline"
+          >
+            Review receipt mappings
+          </Link>
+        </div>
+      ) : null}
 
-        <SavingsBanner totalMissed={totalMissed} />
-
-        <ReliefStats
-          totalCount={reliefs.length}
-          claimedCount={claimed.length}
-          totalClaimed={totalClaimed}
-          totalMissed={totalMissed}
-        />
-
-        <ReliefCardList initialReliefs={reliefs} />
-      </main>
-
-      {/* ── Fixed AI sidebar ──────────────────────────────────────────── */}
-      <aside className="fixed right-0 top-0 hidden h-screen w-96 border-l border-outline-variant/20 bg-surface-container-lowest ambient-shadow-lg lg:flex lg:flex-col z-30">
-        <AiPanel
-          title="Ledger Intelligence"
-          statusLabel="Analysing Profile"
-          message="I've completed the optimisation scan. The most significant finding is the unregistered Lifestyle deduction for your device purchase. I also found EPF contributions that have not been fully claimed. Would you like me to automatically apply all eligible reliefs?"
-          chips={[
-            { label: 'Apply all reliefs' },
-            { label: 'Explain Lifestyle relief' },
-            { label: 'Maximise EPF' },
-          ]}
-          inputPlaceholder="Ask about your tax profile..."
-          className="h-full rounded-none border-0 shadow-none"
-        />
-      </aside>
+      <ReliefsWorkspace
+        initialReliefs={reliefs}
+        profile={profile}
+        taxContext={taxContext}
+      />
     </div>
   )
 }

@@ -15,7 +15,7 @@ import { isFirebaseConfigured } from '@/lib/firebase/client'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { signInEmail, user, loading, devBypass } = useAuth()
+  const { signInEmail, signInGoogle, user, loading, devBypass } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -34,6 +34,19 @@ export default function LoginPage() {
       router.replace('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign in failed.')
+    } finally {
+      setPending(false)
+    }
+  }
+
+  async function onGoogleSignIn() {
+    setError(null)
+    setPending(true)
+    try {
+      await signInGoogle()
+      router.replace('/dashboard')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Google sign in failed.')
     } finally {
       setPending(false)
     }
@@ -131,6 +144,16 @@ export default function LoginPage() {
           disabled={pending || !firebaseReady}
         >
           {pending ? 'Signing in…' : 'Sign in'}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="h-11 w-full font-semibold"
+          onClick={() => void onGoogleSignIn()}
+          disabled={pending || !firebaseReady}
+        >
+          Login using Google
         </Button>
       </form>
     </AuthPanel>

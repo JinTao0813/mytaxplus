@@ -1,11 +1,14 @@
-import { getChatHistory, getChatContext } from '@/lib/services'
+import { getChatHistory, getChatContext } from '@/lib/api'
+import { cookieHeaderFromRequest } from '@/lib/api/server-cookies'
 import { ChatWindow } from './_components/chat-window'
 import { ChatContextSidebar } from './_components/chat-context-sidebar'
 
 export default async function ChatPage() {
+  const cookieHeader = await cookieHeaderFromRequest()
+  const ctx = { cookieHeader }
   const [messages, chatContext] = await Promise.all([
-    getChatHistory(),
-    getChatContext(),
+    getChatHistory(ctx),
+    getChatContext(ctx),
   ])
 
   return (

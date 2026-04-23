@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { apiFetch } from "@/lib/api";
+import { apiFetch } from "@/lib/api/client";
+import { healthResponseSchema } from "@/lib/validations/api-schemas";
 
 export function ApiStatus() {
   const [status, setStatus] = useState<"idle" | "ok" | "err">("idle");
@@ -13,7 +14,9 @@ export function ApiStatus() {
     let cancelled = false;
     void (async () => {
       try {
-        const res = await apiFetch<{ status: string }>("/health");
+        const res = await apiFetch("/health", {
+          responseSchema: healthResponseSchema,
+        });
         if (!cancelled && res.status === "ok") setStatus("ok");
         else if (!cancelled) {
           setStatus("err");
@@ -42,8 +45,8 @@ export function ApiStatus() {
       <Alert>
         <AlertTitle>API reachable</AlertTitle>
         <AlertDescription>
-          FastAPI health check succeeded at{" "}
-          <code className="text-xs">{process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}</code>
+          API health check succeeded at{' '}
+          <code className="text-xs">{process.env.NEXT_PUBLIC_API_URL ?? 'same-origin'}</code>
           .
         </AlertDescription>
       </Alert>
@@ -54,8 +57,8 @@ export function ApiStatus() {
     <Alert variant="destructive">
       <AlertTitle>API unreachable</AlertTitle>
       <AlertDescription>
-        {detail}. Ensure the backend is running (e.g.{" "}
-        <code className="text-xs">make up</code>).
+        {detail}. Ensure the Next.js app is running (e.g.{' '}
+        <code className="text-xs">make dev</code>).
       </AlertDescription>
     </Alert>
   );

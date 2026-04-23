@@ -1,0 +1,29 @@
+---
+description: Next.js app — UI vs server backend; API via lib/api; Zod validation
+globs: frontend/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Frontend rule (Next.js)
+
+## Client (React, RSC that only render)
+
+- **MUST NOT** import `firebase-admin`, DB drivers, or **`frontend/server/**`\*\* from client components or from code bundled for the browser.
+- **MAY** use the **Firebase client SDK** (`firebase/app`, `firebase/auth`, `firebase/storage`, etc.) for sign-in and client-side uploads.
+- **MUST** call HTTP APIs through **`frontend/lib/api/**`** (`apiFetch`, domain modules). Do not scatter raw `fetch('/api/...')`outside`lib/api` unless there is a strong, documented exception.
+- **MUST** validate untrusted input and JSON responses with **Zod** (see `frontend/lib/validations/` and workspace validation rule).
+
+## Server in this repo (Route Handlers + `frontend/server/`)
+
+- **`frontend/app/api/v1/**`** implements the app **backend** (auth, JSON, orchestration). See **`backend-dal-service.mdc`\*\* for layering.
+- **`frontend/server/services/**`** holds server-only application services (`import 'server-only'`).
+- **`frontend/server/<domain>/engine/**`\*\* holds pure domain logic (e.g. tax relief caps).
+
+## Responsibilities summary
+
+| Area                    | Location                        |
+| ----------------------- | ------------------------------- |
+| UI state, forms, layout | `app/(app)/**`, `components/**` |
+| Browser API client      | `lib/api/**`                    |
+| HTTP backend            | `app/api/v1/**`                 |
+| Rules / workflows / DAL | `server/**`                     |
