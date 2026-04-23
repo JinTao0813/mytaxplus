@@ -1,0 +1,328 @@
+{
+  "document": "Malaysia EA Form - Private sector (C.P.8A) - Statement of Remuneration",
+  "schema_version": "1.0",
+  "fields": [
+    {
+      "id": "form_type_cp8a_pin",
+      "label": "Form type / pin (e.g. C.P. 8A - Pin. 2024)",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "header"
+    },
+    {
+      "id": "employer_tin",
+      "label": "Employer's TIN",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "header"
+    },
+    {
+      "id": "employee_tin",
+      "label": "Employee's Tax Identification No. (TIN)",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "header"
+    },
+    {
+      "id": "year_ended",
+      "label": "For the year ended (e.g. 31 December 2025)",
+      "type": "date",
+      "occurrence": "optional",
+      "section": "header"
+    },
+    {
+      "id": "lhdnm_state",
+      "label": "LHDNM State",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "header"
+    },
+
+    {
+      "id": "employee_full_name",
+      "label": "Section A - Full name of employee/pensioner",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+    {
+      "id": "job_designation",
+      "label": "Section A - Job designation",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+    {
+      "id": "staff_payroll_no",
+      "label": "Section A - Staff No. / Payroll No.",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+    {
+      "id": "new_ic_no",
+      "label": "Section A - New I.C. No.",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+    {
+      "id": "passport_no",
+      "label": "Section A - Passport No.",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+    {
+      "id": "epf_no",
+      "label": "Section A - EPF No.",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+    {
+      "id": "socso_no",
+      "label": "Section A - SOCSO No.",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+    {
+      "id": "children_qualified_relief_count",
+      "label": "Section A - Number of children qualified for tax relief",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+    {
+      "id": "employment_commencement_date",
+      "label": "Section A - Period of employment (a) Date of commencement",
+      "type": "date",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+    {
+      "id": "employment_cessation_date",
+      "label": "Section A - Period of employment (b) Date of cessation",
+      "type": "date",
+      "occurrence": "optional",
+      "section": "section_a"
+    },
+
+    {
+      "id": "income_gross_salary_wages_leave_pay_1a",
+      "label": "Section B - 1(a) Gross salary, wages or leave pay (incl. overtime)",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_fees_commission_bonus_1b",
+      "label": "Section B - 1(b) Fees, commission or bonus (incl. director fees)",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_tips_perquisites_allowances_1c",
+      "label": "Section B - 1(c) Gross tips, perquisites, awards/rewards or other allowances",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_tax_borne_by_employer_1d",
+      "label": "Section B - 1(d) Income tax borne by employer",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_esos_benefit_1e",
+      "label": "Section B - 1(e) ESOS benefit",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_gratuity_1f",
+      "label": "Section B - 1(f) Gratuity",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_arrears_preceding_years_2",
+      "label": "Section B - 2 Arrears and others for preceding years (paid in current year)",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_benefits_in_kind_3",
+      "label": "Section B - 3 Benefits in kind",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_value_living_accommodation_4",
+      "label": "Section B - 4 Value of living accommodation",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_refund_unapproved_fund_5",
+      "label": "Section B - 5 Refund from unapproved Provident/Pension Fund",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+    {
+      "id": "income_compensation_loss_of_employment_6",
+      "label": "Section B - 6 Compensation for loss of employment",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_b"
+    },
+
+    {
+      "id": "income_pension_section_c_1",
+      "label": "Section C - 1 Pension",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_c"
+    },
+    {
+      "id": "income_annuities_periodical_2",
+      "label": "Section C - 2 Annuities or other periodical payments",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_c"
+    },
+    {
+      "id": "total_sum_section_b_and_c",
+      "label": "Section C - TOTAL (Sum of B and C)",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_c"
+    },
+
+    {
+      "id": "deduction_mtd_remittance_lhdnm_d1",
+      "label": "Section D - 1 Monthly Tax Deductions (MTD) remitted to LHDNM",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_d"
+    },
+    {
+      "id": "deduction_cp38_remittance_lhdnm_d2",
+      "label": "Section D - 2 CP38 deductions remitted to LHDNM",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_d"
+    },
+    {
+      "id": "deduction_zakat_salary_d3",
+      "label": "Section D - 3 Zakat paid via salary deduction",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_d"
+    },
+    {
+      "id": "deduction_approved_donations_salary_d4",
+      "label": "Section D - 4 Approved donations/gifts/contributions via salary deduction",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_d"
+    },
+    {
+      "id": "deduction_tp1_relief_d5a",
+      "label": "Section D - 5(a) Total claim via Form TP1 - Relief",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_d"
+    },
+    {
+      "id": "deduction_tp1_zakat_non_salary_d5b",
+      "label": "Section D - 5(b) Total claim via Form TP1 - Zakat (other than via monthly salary)",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_d"
+    },
+    {
+      "id": "deduction_qualifying_child_relief_d6",
+      "label": "Section D - 6 Total qualifying child relief",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_d"
+    },
+
+    {
+      "id": "provident_fund_name_e1",
+      "label": "Section E - 1 Name of Provident Fund (e.g. KWSP)",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "section_e"
+    },
+    {
+      "id": "epf_amount_employee_share",
+      "label": "Section E - EPF/KWSP - Amount of compulsory contribution paid (employee share only)",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_e"
+    },
+    {
+      "id": "socso_amount_employee_share",
+      "label": "Section E - SOCSO - Amount of compulsory contribution paid (employee share only)",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_e"
+    },
+
+    {
+      "id": "total_tax_exempt_allowances_section_f",
+      "label": "Section F - Total tax exempt allowances/perquisites/gifts/benefits",
+      "type": "money",
+      "occurrence": "optional",
+      "section": "section_f"
+    },
+
+    {
+      "id": "cert_officer_name",
+      "label": "Footer - Name of officer",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "footer"
+    },
+    {
+      "id": "cert_officer_designation",
+      "label": "Footer - Designation",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "footer"
+    },
+    {
+      "id": "employer_name_address",
+      "label": "Footer - Name and address of employer",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "footer"
+    },
+    {
+      "id": "employer_telephone",
+      "label": "Footer - Employer's telephone no.",
+      "type": "text",
+      "occurrence": "optional",
+      "section": "footer"
+    },
+    {
+      "id": "certification_date",
+      "label": "Footer - Date (of certification / issue)",
+      "type": "date",
+      "occurrence": "optional",
+      "section": "footer"
+    }
+  ]
+}

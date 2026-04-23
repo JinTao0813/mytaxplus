@@ -14,7 +14,7 @@ const navItems = [
   { href: '/dashboard', label: 'Overview', icon: 'dashboard' },
   { href: '/upload', label: 'Tax Files', icon: 'folder_open' },
   { href: '/profile', label: 'Income Builder', icon: 'account_balance' },
-  { href: '/reliefs', label: 'Optimization', icon: 'auto_awesome' },
+  { href: '/reliefs', label: 'Claim planner', icon: 'auto_awesome' },
   { href: '/summary', label: 'Tax Summary', icon: 'calculate' },
   { href: '/filing', label: 'Filing', icon: 'task_alt' },
   { href: '/chat', label: 'AI Assistant', icon: 'chat_bubble' },
@@ -24,7 +24,7 @@ const mobileNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
   { href: '/upload', label: 'Documents', icon: 'folder' },
   { href: '/profile', label: 'Profile', icon: 'person' },
-  { href: '/reliefs', label: 'Relief', icon: 'auto_awesome' },
+  { href: '/reliefs', label: 'Claims', icon: 'auto_awesome' },
 ]
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -107,7 +107,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             href="/reliefs"
             className="mb-2 w-full rounded-lg bg-on-primary-container px-4 py-3 text-center text-sm font-semibold text-on-primary-fixed shadow-lg shadow-on-primary-container/20 hover:opacity-90 transition-opacity"
           >
-            Optimize Returns
+            Plan reliefs
           </Link>
           <div className="border-t border-outline-variant/50 pt-2 flex flex-col gap-0.5">
             <Link

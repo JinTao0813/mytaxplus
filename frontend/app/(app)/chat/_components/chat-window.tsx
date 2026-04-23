@@ -3,29 +3,17 @@
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { MatIcon } from '@/components/ui/mat-icon'
-import { MOCK_SUGGESTED_QUERIES } from '@/lib/mock-data'
+import {
+  generateMockChatReply,
+  MOCK_SUGGESTED_QUERIES,
+} from '@/lib/mock-data'
 import type { ChatMessage, ChatContext } from '@/lib/types'
-
-function formatRM(n: number) {
-  return `RM ${n.toLocaleString('en-MY', { minimumFractionDigits: 2 })}`
-}
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString('en-MY', {
     hour: '2-digit',
     minute: '2-digit',
   })
-}
-
-function generateMockReply(question: string, ctx: ChatContext): string {
-  const q = question.toLowerCase()
-  if (q.includes('relief') || q.includes('claim'))
-    return `Based on your 2023 tax profile, you are eligible for the following Malaysian tax reliefs:\n\n• **Medical Expenses** (Section 46(1)(g)) — up to RM 10,000\n• **Education Fees** (Section 46(1)(f)) — up to RM 7,000\n• **Lifestyle** (Section 46(1)(k)) — up to RM 2,500\n• **EPF / Life Insurance** (Section 46(1)(b)) — up to RM 7,000\n• **Parental Care** (Section 46(1)(c)) — up to RM 8,000\n\nYou currently have RM ${ctx.totalDeductions.toLocaleString()} in optimised deductions.`
-  if (q.includes('high') || q.includes('why'))
-    return `Your chargeable income is higher than it should be because two key reliefs have not been fully claimed: your Lifestyle relief (RM 2,500) and EPF contributions. Once applied, your tax payable drops to ${formatRM(4900)}, saving you ${formatRM(ctx.estimatedSavings)}.`
-  if (q.includes('reduce') || q.includes('save') || q.includes('lower'))
-    return `The top three ways to reduce your tax this year:\n\n1. **Apply Lifestyle Relief** — your laptop purchase qualifies under Section 46(1)(k) for up to RM 2,500.\n2. **Maximise EPF** — you contributed RM 8,400 but only RM 4,000 has been claimed.\n3. **Add Parental Care** — if your parents required medical treatment, you can claim up to RM 8,000.\n\nTogether, these could save you an additional ${formatRM(ctx.estimatedSavings)}.`
-  return `Great question! Based on your 2023 filing profile (Total Income: ${formatRM(ctx.totalIncome)}, Total Deductions: ${formatRM(ctx.totalDeductions)}), I can help you with that. Could you provide more details so I can give you a more precise answer?`
 }
 
 interface Props {
@@ -45,8 +33,9 @@ export function ChatWindow({ initialMessages, chatContext }: Props) {
 
   function sendMessage(text: string) {
     if (!text.trim() || isThinking) return
+    const userId = crypto.randomUUID()
     const userMsg: ChatMessage = {
-      id: `msg-${Date.now()}`,
+      id: `msg-${userId}`,
       role: 'user',
       content: text.trim(),
       timestamp: new Date().toISOString(),
@@ -57,9 +46,9 @@ export function ChatWindow({ initialMessages, chatContext }: Props) {
 
     setTimeout(() => {
       const aiMsg: ChatMessage = {
-        id: `msg-${Date.now()}-ai`,
+        id: `msg-${crypto.randomUUID()}-ai`,
         role: 'assistant',
-        content: generateMockReply(text, chatContext),
+        content: generateMockChatReply(text, chatContext),
         timestamp: new Date().toISOString(),
       }
       setMessages((prev) => [...prev, aiMsg])

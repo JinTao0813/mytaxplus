@@ -44,3 +44,7 @@ yarn-error.log*
 
 !*.md
 /test_documents
+
+# Service account keys and local secrets (never commit)
+.secrets/
+*firebase-adminsdk*.json

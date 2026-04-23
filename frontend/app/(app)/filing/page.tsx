@@ -1,11 +1,14 @@
-import { getFilingData } from '@/lib/services'
-import { AiPanel } from '@/components/layout/ai-panel'
+import Link from 'next/link'
+
+import { getFilingData } from '@/lib/api'
+import { cookieHeaderFromRequest } from '@/lib/api/server-cookies'
 import { FilingProgressBar } from './_components/filing-progress-bar'
 import { StepAccordion } from './_components/step-accordion'
 import { ExportActions } from './_components/export-actions'
 
 export default async function FilingPage() {
-  const filingData = await getFilingData()
+  const cookieHeader = await cookieHeaderFromRequest()
+  const filingData = await getFilingData({ cookieHeader })
 
   const missingCount = filingData.steps
     .flatMap((s) => s.fields ?? [])
@@ -25,36 +28,19 @@ export default async function FilingPage() {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-        {/* Left: checklist */}
-        <div className="flex flex-col gap-6 lg:col-span-8">
-          <FilingProgressBar
-            progress={filingData.overallProgress}
-            missingCount={missingCount}
-          />
-          <StepAccordion steps={filingData.steps} />
-          <ExportActions />
-        </div>
-
-        {/* Right: AI panel */}
-        <div className="lg:col-span-4">
-          <AiPanel
-            title="Filing Assistant AI"
-            statusLabel="Reviewing Your Filing"
-            message={`Your filing is ${filingData.overallProgress}% complete. ${
-              missingCount > 0
-                ? `There ${missingCount === 1 ? 'is 1 missing field' : `are ${missingCount} missing fields`} that need your attention — especially the Parental Care relief which requires supporting documentation.`
-                : 'All required fields are complete. You are ready to export and submit.'
-            }`}
-            chips={[
-              { label: 'What docs are needed?' },
-              { label: 'Parental Care help' },
-              { label: 'How to submit LHDN?' },
-            ]}
-            inputPlaceholder="Ask about your filing..."
-            className="sticky top-8"
-          />
-        </div>
+      <div className="flex flex-col gap-6">
+        <p className="text-sm text-on-surface-variant">
+          Stuck on a step?{' '}
+          <Link href="/chat" className="font-semibold text-secondary underline">
+            Ask AI Assistant
+          </Link>
+        </p>
+        <FilingProgressBar
+          progress={filingData.overallProgress}
+          missingCount={missingCount}
+        />
+        <StepAccordion steps={filingData.steps} />
+        <ExportActions />
       </div>
     </div>
   )

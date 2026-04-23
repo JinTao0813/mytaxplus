@@ -15,7 +15,7 @@ import { isFirebaseConfigured } from '@/lib/firebase/client'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { signUpEmail, user, loading, devBypass } = useAuth()
+  const { signUpEmail, signInGoogle, user, loading, devBypass } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -34,6 +34,19 @@ export default function RegisterPage() {
       router.replace('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed.')
+    } finally {
+      setPending(false)
+    }
+  }
+
+  async function onGoogleSignIn() {
+    setError(null)
+    setPending(true)
+    try {
+      await signInGoogle()
+      router.replace('/dashboard')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Google sign in failed.')
     } finally {
       setPending(false)
     }
@@ -128,6 +141,16 @@ export default function RegisterPage() {
           disabled={pending || !firebaseReady}
         >
           {pending ? 'Creating…' : 'Create account'}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="h-11 w-full font-semibold"
+          onClick={() => void onGoogleSignIn()}
+          disabled={pending || !firebaseReady}
+        >
+          Login using Google
         </Button>
       </form>
     </AuthPanel>

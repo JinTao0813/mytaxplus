@@ -42,4 +42,4 @@ yarn-error.log*
 *.tsbuildinfo
 # next-env.d.ts is auto-updated by Next.js; keep it committed (see Next.js TypeScript docs)
 
-*.md
+!*.md

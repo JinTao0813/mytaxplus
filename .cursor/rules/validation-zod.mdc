@@ -1,0 +1,41 @@
+---
+description: Runtime validation with Zod in the TypeScript/Next.js frontend
+globs: frontend/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+Layer boundaries for the Next.js app (no DAL/service in frontend, API via `lib/api`) are in **`frontend-nextjs-architecture.mdc`**.
+
+# Frontend — Zod validation
+
+Use **Zod** for runtime validation across the Next.js app: forms, `fetch`/`JSON` parsing, search params, and any untrusted external input.
+
+## Project context
+
+- Declare **`zod`** as a **direct** `dependencies` entry in `frontend/package.json` (do not rely only on transitive versions from other packages).
+- **Backend** in this repo is **Next.js Route Handlers** (`frontend/app/api/v1/**`): validate request/query JSON with **Zod** at the boundary. Zod is for **TypeScript/JavaScript** only.
+- Shared API response schemas live under **`frontend/lib/validations/`** (e.g. `api-schemas.ts`); `apiFetch` accepts optional `responseSchema` in `frontend/lib/api/client.ts`.
+
+## Rules
+
+1. **Prefer schemas over loose types** — For data that crosses boundaries (API JSON, `localStorage`, URL params), define a `z` schema and **parse** (or `safeParse`) instead of casting with `as` or unchecked `JSON.parse`.
+2. **Colocate or centralize** — Keep reusable schemas under something like `frontend/lib/validations/` (or feature `schemas.ts` files). Export inferred types via `z.infer<typeof schema>`.
+3. **Forms and actions** — Validate user input with Zod before submit or inside server actions/route handlers; surface `ZodError` / field errors in the UI.
+4. **API responses** — When the frontend calls the FastAPI backend, parse JSON with a Zod schema that matches the contract (keep in sync with Pydantic models on the server).
+
+## Anti-patterns
+
+- Relying on `as SomeType` for JSON from `response.json()`.
+- Duplicating the same shape as a TypeScript `interface` without a corresponding Zod schema when the data is validated at runtime.
+
+## Minimal example
+
+```typescript
+import { z } from "zod";
+
+export const profilePatchSchema = z.object({
+  maritalStatus: z.enum(["single", "married"]).optional(),
+});
+
+export type ProfilePatch = z.infer<typeof profilePatchSchema>;
+```

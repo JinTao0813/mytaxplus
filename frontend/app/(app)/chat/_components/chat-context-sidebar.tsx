@@ -9,7 +9,7 @@ function formatRM(n: number) {
 const quickNav = [
   { href: '/upload', label: 'Document Ingestion', icon: 'upload_file' },
   { href: '/profile', label: 'Tax Profile', icon: 'account_balance' },
-  { href: '/reliefs', label: 'Relief Optimisation', icon: 'auto_awesome' },
+  { href: '/reliefs', label: 'Relief claim planner', icon: 'auto_awesome' },
   { href: '/summary', label: 'Tax Summary', icon: 'calculate' },
   { href: '/filing', label: 'Filing Assistant', icon: 'task_alt' },
 ]
